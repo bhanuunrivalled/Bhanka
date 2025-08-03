@@ -80,6 +80,11 @@ return Objects.hash(key, value);
 
 ### 🔄 Phase 2: Partition Implementation - IN PROGRESS
 
+**📚 FIRST: Read the Lessons!**
+- **`lessons/00-big-picture-mvp.md`** - What are we building and why?
+- **`lessons/01-why-partitions.md`** - Understand the problem we're solving
+- **`lessons/02-partition-data-structure.md`** - Deep dive into implementation
+
 **Current Task: 2.1 - Implement Partition Constructor and Basic Methods**
 
 **What You'll Learn**:
@@ -203,6 +208,12 @@ mvn test -Dtest=PartitionTest#testCreateEmptyPartition
 - `KAFKA_LEARNING_PATH.md` - This file (single source of truth)
 - `README.md` - Basic project info
 - `pom.xml` - Maven build configuration
+
+**Learning Materials**:
+- `lessons/` - Concept explanations and problem understanding
+  - `00-big-picture-mvp.md` - What are we building? (START HERE!)
+  - `01-why-partitions.md` - Why do we need partitions?
+  - `02-partition-data-structure.md` - How to implement partitions
 
 **Source Code**:
 - `src/main/java/` - Your implementations (with TODOs)
