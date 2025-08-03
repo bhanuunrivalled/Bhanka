@@ -47,23 +47,23 @@ Learn Java server-side programming and data structures by implementing Kafka's c
 
 ```mermaid
 graph TB
-    subgraph "Kafka System"
-        TR[TopicRegistry<br/>📊 Centralized Broker]
+    subgraph KafkaSystem["Kafka System"]
+        TR[TopicRegistry<br/>Centralized Broker]
 
-        subgraph "Topics"
-            T1[Topic: user-events<br/>🔀 3 partitions]
-            T2[Topic: order-events<br/>🔀 2 partitions]
-            T3[Topic: logs<br/>🔀 1 partition]
+        subgraph Topics
+            T1[Topic: user-events<br/>3 partitions]
+            T2[Topic: order-events<br/>2 partitions]
+            T3[Topic: logs<br/>1 partition]
         end
 
         TR --> T1
         TR --> T2
         TR --> T3
 
-        subgraph "Partitions (user-events)"
-            P1[Partition 0<br/>📝 Messages: 0,1,2...]
-            P2[Partition 1<br/>📝 Messages: 0,1,2...]
-            P3[Partition 2<br/>📝 Messages: 0,1,2...]
+        subgraph Partitions["Partitions (user-events)"]
+            P1[Partition 0<br/>Messages: 0,1,2...]
+            P2[Partition 1<br/>Messages: 0,1,2...]
+            P3[Partition 2<br/>Messages: 0,1,2...]
         end
 
         T1 --> P1
@@ -71,18 +71,18 @@ graph TB
         T1 --> P3
     end
 
-    subgraph "Clients"
-        PROD[Producer<br/>📤 Sends messages]
-        CONS[Consumer<br/>📥 Reads messages]
+    subgraph Clients
+        PROD[Producer<br/>Sends messages]
+        CONS[Consumer<br/>Reads messages]
     end
 
     PROD -.->|connects to| TR
     CONS -.->|connects to| TR
 
-    PROD -->|send("user-events", key, value)| T1
-    T1 -->|hash(key) % 3| P1
-    T1 -->|hash(key) % 3| P2
-    T1 -->|hash(key) % 3| P3
+    PROD -->|send message| T1
+    T1 -->|hash routing| P1
+    T1 -->|hash routing| P2
+    T1 -->|hash routing| P3
 
     P1 -->|read sequentially| CONS
     P2 -->|read sequentially| CONS
