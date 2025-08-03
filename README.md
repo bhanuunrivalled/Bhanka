@@ -34,6 +34,7 @@ Learn Java server-side programming and data structures by implementing Kafka's c
 ## 📁 Key Files
 
 - **`KAFKA_LEARNING_PATH.md`** - Complete learning guide (single source of truth)
+- **`lessons/`** - Concept explanations (read these first!)
 - **`src/test/java/`** - Complete tests (define what to build)
 - **`src/main/java/`** - Your implementations (with TODOs)
 - **`pom.xml`** - Maven build configuration

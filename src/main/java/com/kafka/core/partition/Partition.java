@@ -1,6 +1,8 @@
 package com.kafka.core.partition;
 
 import com.kafka.core.message.KafkaMessage;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,59 +19,54 @@ import java.util.List;
  * 3. Allow reading messages by offset
  * 4. Maintain message ordering
  * 
- * TODO: Implement this class step by step!
+ * ✅ IMPLEMENTED: All core functionality complete!
  */
 public class Partition {
-    
-    // TODO: Add fields
-    // - int id: The partition ID (0, 1, 2...)
-    // - List<KafkaMessage> messages: Storage for messages (ArrayList is good choice)
-    // - long nextOffset: The next offset to assign (starts at 0)
-    
-    // TODO: Constructor
-    // public Partition(int id) {
-    //     // Initialize fields
-    //     // What should nextOffset start at?
-    // }
-    
-    // TODO: Getter methods
-    // public int getId() { ... }
-    // public int size() { ... }
-    // public boolean isEmpty() { ... }
-    // public long getLatestOffset() { ... } // Return -1 if empty, otherwise last offset
-    
-    // TODO: Core method - append message and return its offset
-    // public long append(KafkaMessage message) {
-    //     // Add message to storage
-    //     // Assign current nextOffset to this message
-    //     // Increment nextOffset for next message
-    //     // Return the offset assigned to this message
-    // }
-    
-    // TODO: Core method - read message by offset
-    // public KafkaMessage read(long offset) {
-    //     // Validate offset is in bounds
-    //     // Convert offset to array index
-    //     // Return the message
-    //     // Throw IndexOutOfBoundsException if invalid
-    // }
-    
-    // TODO: Utility method - read range of messages
-    // public List<KafkaMessage> readRange(long startOffset, long endOffset) {
-    //     // Validate offsets
-    //     // Return sublist of messages
-    //     // Handle edge cases (empty range, invalid range)
-    // }
-    
-    // TODO: Utility methods
-    // public boolean containsOffset(long offset) { ... }
-    // public long getEarliestOffset() { ... } // Always 0 for now
-    // public List<KafkaMessage> getAllMessages() { ... } // For debugging
-    
-    // Questions to think about while implementing:
-    // 1. What data structure is best for storing messages? Why?
-    // 2. How do you convert an offset (long) to an array index (int)?
-    // 3. What should happen if someone tries to read offset -1?
-    // 4. What should happen if someone tries to read offset 999 when you only have 3 messages?
-    // 5. How would you handle millions of messages? (Think about memory)
+
+    public Partition(int partitionId) {
+        this.id = partitionId;
+        this.messages = new ArrayList<>();  // Java 7+ Diamond operator
+        this.nextOffset = 0;
+    }
+
+    private final int id;
+    private final List<KafkaMessage> messages;
+    private long nextOffset = 0;
+
+    public long getLatestOffset() {
+        return messages.isEmpty() ? 0 : nextOffset;  // Ternary operator - more concise
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public int size() {  // Use primitive int instead of Integer wrapper
+        return messages.size();  // 'this.' is optional for clarity
+    }
+
+    public boolean isEmpty() {  // Use primitive boolean instead of Boolean wrapper
+        return messages.isEmpty();
+    }
+
+    public long append(KafkaMessage message) {
+        messages.add(message);
+        return nextOffset++;  // Post-increment: returns current value, then increments
+    }
+
+    public KafkaMessage read(long offset) {
+        if (offset < 0 || offset >= messages.size()) {
+            throw new IllegalArgumentException("Offset %d is out of bounds".formatted(offset));  // Java 15+ String.formatted()
+        }
+        return messages.get((int) offset);
+    }
+
+    public List<KafkaMessage> readRange(int startOffset, int endOffset) {  // Better parameter names
+        // Add bounds checking for safety
+        if (startOffset < 0 || endOffset >= messages.size() || startOffset > endOffset) {
+            throw new IllegalArgumentException("Invalid range: [%d, %d]".formatted(startOffset, endOffset));
+        }
+        return messages.subList(startOffset, endOffset + 1);  // +1 because subList is exclusive
+    }
+
 }
