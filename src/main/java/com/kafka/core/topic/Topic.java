@@ -1,5 +1,8 @@
 package com.kafka.core.topic;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.kafka.core.message.KafkaMessage;
 import com.kafka.core.partition.Partition;
 
@@ -16,51 +19,84 @@ import com.kafka.core.partition.Partition;
  * 2. Route messages to the correct partition based on key
  * 3. Provide access to partitions for reading
  * 
- * TODO: Implement this class step by step!
  */
 public class Topic {
-    
-    // TODO: Add fields
-    // - String name: The topic name
-    // - List<Partition> partitions: The partitions in this topic
-    // - int partitionCount: Number of partitions (for convenience)
-    
-    // TODO: Constructor with just name (default to 1 partition)
-    // public Topic(String name) {
-    //     // Initialize with 1 partition
-    // }
-    
-    // TODO: Constructor with name and partition count
-    // public Topic(String name, int partitionCount) {
-    //     // Validate inputs
-    //     // Create the specified number of partitions
-    // }
-    
-    // TODO: Getter methods
-    // public String getName() { ... }
-    // public int getPartitionCount() { ... }
-    // public Partition getPartition(int index) { ... }
-    
-    // TODO: Core method - send message to appropriate partition
-    // public void send(KafkaMessage message) {
-    //     // If message has key: use hash to determine partition
-    //     // If message has no key: use round-robin or random
-    //     // Then append to the chosen partition
-    // }
-    
-    // TODO: Utility methods
-    // public int getTotalMessageCount() { ... }
-    // public long getTotalMessages() { ... }
-    
-    // TODO: Helper method to calculate partition for a key
-    // private int calculatePartition(String key) {
-    //     // Use key.hashCode() % partitionCount
-    //     // Handle negative hash codes properly
-    // }
-    
-    // Questions to think about while implementing:
-    // 1. What should happen if name is null or empty?
-    // 2. What should happen if partitionCount is 0 or negative?
-    // 3. How do you handle negative hash codes?
-    // 4. Should you allow changing partition count after creation?
+
+    private final String name;
+    private final List<Partition> partitions;
+    private final int partitionCount;
+    private int roundRobinCounter = 0;
+
+    public Topic(String topicName) {
+        this.name = topicName;
+        this.partitionCount = 1;
+        this.partitions = List.of(new Partition(0));
+    }
+
+
+    public Topic(String name, int partitionCount) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Topic name cannot be null or empty");
+        }
+        if (partitionCount <= 0) {
+            throw new IllegalArgumentException("Partition count must be positive");
+        }
+        this.name = name;
+        this.partitionCount = partitionCount;
+        this.partitions = createPartitions(partitionCount);
+    }
+
+    private List<Partition> createPartitions(int partitionCount2) {
+        Partition[] partitions = new Partition[partitionCount2];
+        for (int i = 0; i < partitionCount2; i++) {
+            partitions[i] = new Partition(i);
+        }
+        return Arrays.asList(partitions);
+    }
+
+    public Partition getPartition(int index) {
+        if (index < 0 || index >= partitions.size()) {
+            throw new IllegalArgumentException("Partition index %d is out of bounds".formatted(index));
+        }
+        return partitions.get(index);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getPartitionCount() {
+        return partitionCount;
+    }
+
+    public String toString() {
+        return String.format("Topic{name='%s', partitionCount=%d}", name, partitionCount);
+    }
+
+
+    public void send(String sameKey, String string) {
+        KafkaMessage message = KafkaMessage.builder()
+        .key(sameKey)
+        .value(string)
+        .build();
+        int partitionIndex = calculatePartition(sameKey);
+        partitions.get(partitionIndex).append(message);
+    }
+
+
+    private int calculatePartition(String sameKey) {
+        if (sameKey == null) {
+            return roundRobinCounter++ % partitions.size();
+        } else {
+            return Math.abs(sameKey.hashCode()) % partitions.size();
+        }
+    }
+
+
+    public Integer getTotalMessageCount() {
+        return partitions.stream()
+        .mapToInt(Partition::size)
+        .sum();
+    }
+
 }
