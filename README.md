@@ -11,9 +11,9 @@ Learn Java server-side programming and data structures by implementing Kafka's c
 
 2. **Follow the learning path**: See `KAFKA_LEARNING_PATH.md` for complete guidance
 
-3. **All core components complete!** Ready for Phase 4:
+3. **All phases complete!** Run the full test suite:
    ```bash
-   mvn test  # All 22 tests passing!
+   mvn test  # All 35 tests passing!
    ```
 
 ## 📋 Current Progress
@@ -21,7 +21,9 @@ Learn Java server-side programming and data structures by implementing Kafka's c
 - ✅ **Phase 1: KafkaMessage** - COMPLETE (10/10 tests passing)
 - ✅ **Phase 2: Partition** - COMPLETE (7/7 tests passing)
 - ✅ **Phase 3: Topic** - COMPLETE (5/5 tests passing)
-- 🔄 **Phase 4: Producer/Consumer** - READY TO START
+- ✅ **Phase 4: Producer/Consumer** - COMPLETE (13/13 tests passing)
+
+**🎯 Total: 35/35 tests passing!**
 
 ## 📚 Learning Approach
 
@@ -41,14 +43,76 @@ Learn Java server-side programming and data structures by implementing Kafka's c
 
 ## 🎯 Next Steps
 
-**🎉 Core Implementation Complete!**
+## 🏗️ **System Architecture**
 
-**What You've Built:**
+```mermaid
+graph TB
+    subgraph "Kafka System"
+        TR[TopicRegistry<br/>📊 Centralized Broker]
+
+        subgraph "Topics"
+            T1[Topic: user-events<br/>🔀 3 partitions]
+            T2[Topic: order-events<br/>🔀 2 partitions]
+            T3[Topic: logs<br/>🔀 1 partition]
+        end
+
+        TR --> T1
+        TR --> T2
+        TR --> T3
+
+        subgraph "Partitions (user-events)"
+            P1[Partition 0<br/>📝 Messages: 0,1,2...]
+            P2[Partition 1<br/>📝 Messages: 0,1,2...]
+            P3[Partition 2<br/>📝 Messages: 0,1,2...]
+        end
+
+        T1 --> P1
+        T1 --> P2
+        T1 --> P3
+    end
+
+    subgraph "Clients"
+        PROD[Producer<br/>📤 Sends messages]
+        CONS[Consumer<br/>📥 Reads messages]
+    end
+
+    PROD -.->|connects to| TR
+    CONS -.->|connects to| TR
+
+    PROD -->|send("user-events", key, value)| T1
+    T1 -->|hash(key) % 3| P1
+    T1 -->|hash(key) % 3| P2
+    T1 -->|hash(key) % 3| P3
+
+    P1 -->|read sequentially| CONS
+    P2 -->|read sequentially| CONS
+    P3 -->|read sequentially| CONS
+
+    style TR fill:#e1f5fe
+    style PROD fill:#f3e5f5
+    style CONS fill:#e8f5e8
+    style T1 fill:#fff3e0
+    style P1 fill:#fce4ec
+    style P2 fill:#fce4ec
+    style P3 fill:#fce4ec
+```
+
+## 🎯 **What You've Built - Complete Kafka MVP!**
+
+**Core Components:**
 - ✅ **KafkaMessage** - Immutable message objects with builder pattern
 - ✅ **Partition** - Append-only log with sequential offsets
 - ✅ **Topic** - Hash-based message routing across multiple partitions
+- ✅ **Producer** - Clean API for sending messages to topics
+- ✅ **Consumer** - Iterator-style API for reading messages
+- ✅ **TopicRegistry** - Centralized broker for topic management
 
-**Ready for Phase 4**: Producer/Consumer APIs for clean usage patterns!
+**Key Features:**
+- 🔀 **Hash-based partitioning** for consistent message routing
+- 📝 **Sequential offsets** for message ordering within partitions
+- 🔄 **Round-robin distribution** for null-key messages
+- 🏗️ **Clean architecture** with independent Producer/Consumer
+- ✅ **Comprehensive testing** with 35 passing tests
 
 ## 🛠️ Technologies
 
